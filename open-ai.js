@@ -152,7 +152,8 @@ const generateHTML = (content) => {
   async function sendMessage(sender, input) {
     send.disabled = true;
     chatInput.disabled = true;
-    const userInput = input.value;
+    const userInput = input.value.toString();
+    input.value = '현재 AI가 답변을 준비중입니다... 잠시만 기다려주세요.';
     const response = await fetch('/', {
       method: 'POST',
       headers: {
