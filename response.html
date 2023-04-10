@@ -1,0 +1,162 @@
+
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <title>OpenAI Response</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <style>
+    @import url("https://fonts.googleapis.com/css?family=Raleway:400,400i,700");
+    body {
+      font-family: sans-serif;
+      background-color: #343541;
+      line-height: 1.25rem;
+    }
+
+    .question {
+      font-size: .875rem;
+      font-weight: bold;
+      margin-bottom: 1em;
+      background-color: #343541;
+      color: #ECECF1;
+    }
+
+    .answer {
+      font-size: .875rem;
+      margin-bottom: 1em;
+      background-color: #444654;
+      color: #D1D5DB;
+      border: 0 solid #d9d9e3;
+      border-radius: 1px;
+      box-sizing: border-box;
+    }
+
+    .chat-box-footer {
+      width: 100%;
+      padding: 20px 15px;
+      border-top: solid 1px #cfcfcf;
+      box-sizing: border-box;
+      display: flex;
+    }
+
+      #chat_input {
+        color: #2f2f2f;
+        font-family: Raleway, sans-serif;
+        font-size:  16px;
+        background-color: #d2d2d2;
+        width: 100%;
+        height: 40px;
+        max-height: 1500px;
+        border: none;
+        padding: 10px 15px;
+        resize: none;
+        box-sizing: border-box;
+        border-radius: 13px;
+        transition: 0.3s background-color;
+      }
+
+      #send {
+        background: none;
+        border: none;
+        margin-left: 10px;
+        padding: 5px;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+    
+  </style>
+  </head>
+  <body> 
+    <div class="question"><p>node js 서버 구현해줘</p>
+</div>
+    <div class="answer"><p>먼저 Node.js를 설치해야 합니다. Node.js 공식 홈페이지에서 다운로드 받을 수 있습니다.</p>
+<p>설치가 완료되면, 다음과 같이 간단한 서버를 구현할 수 있습니다.</p>
+<pre><code class="language-javascript">const http = require(&#39;http&#39;);
+
+const hostname = &#39;127.0.0.1&#39;;
+const port = 3000;
+
+const server = http.createServer((req, res) =&gt; {
+  res.statusCode = 200;
+  res.setHeader(&#39;Content-Type&#39;, &#39;text/plain&#39;);
+  res.end(&#39;Hello World\n&#39;);
+});
+
+server.listen(port, hostname, () =&gt; {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
+</code></pre>
+<p>이 코드는 간단한 HTTP 서버를 생성하고, 요청이 들어오면 &quot;Hello World&quot;를 응답으로 보내줍니다. 이 서버를 실행하려면, 터미널에서 다음 명령어를 입력합니다.</p>
+<pre><code>node server.js
+</code></pre>
+<p>이제 브라우저에서 <code>http://127.0.0.1:3000</code>에 접속하면 &quot;Hello World&quot;가 출력됩니다.</p>
+</div>
+    <div class="chat-box-footer">
+    <textarea id="chat_input" placeholder="Enter your message here..."></textarea>
+    <button id="send">
+      <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+        <path fill="#006ae3" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+      </svg>
+    </button>
+  </div>
+</body>
+<script>
+  const chatInput = document.querySelector('#chat_input');
+  const typing = document.querySelector('#typing');
+  const send = document.querySelector('#send');
+  const chatMessages = document.querySelector('#chat_messages');
+  const chatBoxBody = document.querySelector('#chat_box_body');
+  const chatThread = {};
+
+  // ----- EVENTS ----- //
+
+  chatInput.addEventListener('input', function () {
+    this.style.height = '0';
+    this.style.height = this.scrollHeight + 1 + 'px';
+  });
+
+  chatInput.addEventListener('keydown', async function (evt) {
+    if (evt.keyCode == 13 && !evt.shiftKey) {
+      evt.preventDefault();
+      await sendMessage('my', this);
+      chatInput.disabled = false;
+    }
+  });
+
+  send.addEventListener('click', async function(evt) {
+    evt.preventDefault();
+    await sendMessage('my', chatInput);
+  });
+
+  async function sendMessage(sender, input) {
+    send.disabled = true;
+    chatInput.disabled = true;
+    const userInput = input.value;
+    const response = await fetch('/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ question: userInput })
+    }).then(response => {
+      if (response.ok) {
+        send.disabled = false;
+        chatInput.disabled = false;
+        return response.text();
+      }
+      throw new Error('Network response was not ok.');
+    })
+      .then(html => {
+        document.documentElement.innerHTML = html;
+        location.reload();
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+      });
+
+      input.value = '';
+  }
+
+</script>
+</html>
