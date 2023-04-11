@@ -28,6 +28,7 @@ const generateHTML = (content) => {
     .filter((element) => element.role === "user")
     .map((element) => element.content);
 
+  //TODO : Add a function to generate HTML
   let htmlFront = `
   <!DOCTYPE html>
   <html>
@@ -126,8 +127,9 @@ const generateHTML = (content) => {
   <body> `;
 
   for (let i = 0; i < questionList.length; i++) {
+    //TODO : 질문 영역은 html로 인식을 하지 못하게끔 해야함.
     htmlFront += `
-    <div class="question">${marked.marked(questionList[i])}</div>`;
+    <div class="question">'${questionList[i]}'</div>`;
 
     if (answerList[i] === undefined) {
       break;
@@ -135,6 +137,8 @@ const generateHTML = (content) => {
     htmlFront += `
     <div class="answer">${marked.marked(answerList[i])}</div>`;
   }
+
+  //TODO : Add a function to generate HTML
   const html =
     htmlFront +
     `
@@ -207,6 +211,11 @@ const generateHTML = (content) => {
 
   document.querySelectorAll('pre code').forEach(function (codeBlock) {
     // Create copy button
+    const parent = codeBlock.parentElement;
+    if(parent.className === 'question') {
+      return;
+    }
+
     const copyButton = document.createElement('button');
     const copyDiv = document.createElement('div');
     const codeBlockDiv = document.createElement('div');
@@ -269,7 +278,7 @@ export async function handleInput(inputStr) {
       conversation_history.push({ role: "assistant", content: message });
 
       const html = await generateHTML(conversation_history);
-      fs.writeFileSync("response.html", html);
+      fs.writeFileSync("./src/response.html", html);
       // Print the response
       console.log(`${model}: ${message}`);
 
