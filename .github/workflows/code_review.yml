@@ -46,7 +46,7 @@ jobs:
         run: |
           file_list="${{ env.changed_files }}"
           IFS=' ' read -ra files_array <<< "$file_list" # 공백을 기준으로 문자열을 배열로 변환
-          reviews=$(npx node code_review.js "${files_array[@]}") # 변경됨: ts-node를 사용하여 실행
+          reviews=$(node code_review.js "${files_array[@]}") # 변경됨: ts-node를 사용하여 실행
           if [ -z "$reviews" ]; then
             echo "No reviews generated"
             echo "::set-output name=reviews::{}" # empty JSON object
