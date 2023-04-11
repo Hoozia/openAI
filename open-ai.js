@@ -1,15 +1,15 @@
-import { Configuration, OpenAIApi } from 'openai';
-import fs from 'fs';
-import * as marked from 'marked';
-import readline from 'readline';
+import { Configuration, OpenAIApi } from "openai";
+import fs from "fs";
+import * as marked from "marked";
+import readline from "readline";
 
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
-const USERNAME = 'USER';
-const model = 'gpt-3.5-turbo';
+const USERNAME = "USER";
+const model = "gpt-3.5-turbo";
 
 let conversation_history = [
-  { role: 'system', content: 'You are a nodejs developer assistant.' },
+  { role: "system", content: "You are a nodejs developer assistant." },
 ];
 
 dotenv.config();
@@ -21,11 +21,11 @@ const configuration = new Configuration({
 
 const generateHTML = (content) => {
   const answerList = content
-    .filter((element) => element.role === 'assistant')
+    .filter((element) => element.role === "assistant")
     .map((element) => element.content);
 
   const questionList = content
-    .filter((element) => element.role === 'user')
+    .filter((element) => element.role === "user")
     .map((element) => element.content);
 
   let htmlFront = `
@@ -34,8 +34,8 @@ const generateHTML = (content) => {
   <head>
     <meta charset="UTF-8">
     <title>OpenAI Response</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" integrity="sha512-mIs9kKbaw6JZFfSuo+MovjU+Ntggfoj8RwAmJbVXQ5mkAX5LlgETQEweFPI18humSPHymTb5iikEOKWF7I8ncQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
     @import url("https://fonts.googleapis.com/css?family=Raleway:400,400i,700");
     body {
@@ -93,6 +93,32 @@ const generateHTML = (content) => {
         padding: 5px;
         cursor: pointer;
         border-radius: 50%;
+      }
+
+      .copy-div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 30px;
+        background-color: #f1f1f1;
+        border-bottom: 1px solid #ddd;
+        padding: 5px;
+        box-sizing: border-box;
+      }
+  
+      .copy-button {
+        float: right;
+        background-color: #343541;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 5px;
+        cursor: pointer;
+      }
+  
+      .copy-button:hover {
+        background-color: #444654;
       }
     
   </style>
@@ -179,21 +205,52 @@ const generateHTML = (content) => {
       input.value = '';
   }
 
+  document.querySelectorAll('pre code').forEach(function (codeBlock) {
+    // Create copy button
+    const copyButton = document.createElement('button');
+    const copyDiv = document.createElement('div');
+    const codeBlockDiv = document.createElement('div');
+
+    codeBlockDiv.className = 'code-block-div';
+    codeBlockDiv.appendChild(copyButton);
+    copyDiv.className = 'copy-div';
+
+    copyButton.className = 'copy-button';
+    copyButton.textContent = 'Copy';
+    
+    
+
+    // Append copy button to code block
+    codeBlock.parentNode.insertBefore(codeBlockDiv, codeBlock);
+
+
+    // Add copy event listener to copy button
+    copyButton.addEventListener('click', function () {
+      const code = codeBlock.innerText;
+      navigator.clipboard.writeText(code)
+        .then(function () {
+          copyButton.textContent = 'Code block copied to clipboard.';
+        })
+        .catch(function (err) {
+          copyButton.textContent= 'Failed to copy code block: ', + err
+        });
+    });
+  });
 </script>
 </html>`;
 
   return html;
 };
 
-console.log('<<--- Hello Node.js ---->>');
+console.log("<<--- Hello Node.js ---->>");
 
-console.log('*- OpenAI API Tutorial...');
+console.log("*- OpenAI API Tutorial...");
 
 const openai = new OpenAIApi(configuration);
 
 const getResponse = async (prompt) => {
   const response = await openai.createChatCompletion({
-    model: 'gpt-3.5-turbo',
+    model: "gpt-3.5-turbo",
     messages: prompt,
     temperature: 0.2,
   });
@@ -203,16 +260,16 @@ const getResponse = async (prompt) => {
 
 export async function handleInput(inputStr) {
   // Update the conversation history
-  conversation_history.push({ role: 'user', content: inputStr });
+  conversation_history.push({ role: "user", content: inputStr });
 
   // Generate a response using GPT-3
   return getResponse(conversation_history)
     .then(async (message) => {
       // Update the conversation history
-      conversation_history.push({ role: 'assistant', content: message });
+      conversation_history.push({ role: "assistant", content: message });
 
       const html = await generateHTML(conversation_history);
-      fs.writeFileSync('response.html', html);
+      fs.writeFileSync("response.html", html);
       // Print the response
       console.log(`${model}: ${message}`);
 
