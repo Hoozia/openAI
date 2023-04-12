@@ -26,7 +26,7 @@ const openai = new OpenAIApi(configuration);
 
 const getResponse = async (prompt) => {
   const response = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
+    model,
     messages: prompt,
     temperature: 0.2,
   });
