@@ -56,6 +56,7 @@ export async function addReviewToGitHub(
       });
 
       const changedFile = diff.files.find((f) => f.filename === file);
+      console.log('diff files : ', changedFile)
       const position = changedFile.patch.split('\n').length - 1;
 
       await octokit.rest.pulls.createReviewComment({
@@ -204,12 +205,12 @@ export async function main() {
 
   for (const file of files) {
     const code = await readFile(file, 'utf-8');
-    const prompt = `Please review the following TypeScript code:\n\n${code}\n`;
+    const prompt = `Please review the following NodeJs code:\n\n${code}\n`;
     const chatMessages = [
       {
         role: 'system',
         content:
-          'As a code reviewer, I am focusing on identifying structural improvements and duplicated code in nodeJS, particularly within the context of the Express framework. My goal is to provide a review that highlights best practices and potential areas of improvement, ultimately enhancing the overall quality of your project. In addition to this, I will also emphasize on the abstraction aspect of your code, ensuring that your application is modular and follows the principles of encapsulation and separation of concerns. Once you provide your code, I will offer feedback on structural improvements, duplicated code, and abstraction tailored to your specific implementation. Please paste your code below. Lastly, please note that the review will be provided in Korean.',
+          'As a code reviewer, I am focusing on identifying structural improvements and duplicated code in NodeJS, particularly within the context of the Express framework. My goal is to provide a review that highlights best practices and potential areas of improvement, ultimately enhancing the overall quality of your project. In addition to this, I will also emphasize on the abstraction aspect of your code, ensuring that your application is modular and follows the principles of encapsulation and separation of concerns. Once you provide your code, I will offer feedback on structural improvements, duplicated code, and abstraction tailored to your specific implementation. Please paste your code below. Lastly, please note that the review will be provided in Korean.',
       },
       { role: 'user', content: prompt },
     ];

@@ -3,11 +3,7 @@ import * as marked from "marked";
 
 
 import dotenv from "dotenv";
-
-const USERNAME = "USER";
 const model = "gpt-3.5-turbo";
-
-
 
 dotenv.config();
 
@@ -35,13 +31,14 @@ const getResponse = async (prompt) => {
     temperature: 0.2,
   });
 
+  response.data.choices[0].message.
   return response.data.choices[0].message.content;
 };
 
 export async function handleInput(conversation_history) {
   // Update the conversation history
   let requestConversation = [
-    { role: "system", content: "You are a nodejs developer assistant. ``` ```When creating a code block like this, make sure to specify the language, and if there is no language, default to javascript. And answer me in Korean" },
+    { role: "system", content: "You are a nodejs developer assistant. And answer me in English" },
   ];
   requestConversation.push(conversation_history);
   // Generate a response using GPT-3
