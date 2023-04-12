@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai';
+import { Configuration, OpenAIApi } from 'openai';
 import axios from 'axios';
 import { getOctokit, context } from '@actions/github';
 
