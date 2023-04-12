@@ -12,20 +12,18 @@ const configuration = new Configuration({
   apiKey: process.env.OPEN_AI_API_KEY,
 });
 
-const parseData = (answer) => {
+const convertToHtml = (answer) => {
   answer.content = marked.marked(answer.content);
-
-  return { answer };
- }
+};
 
 console.log("<<--- Hello Node.js ---->>");
 
 console.log("*- OpenAI API Tutorial...");
 
-const openai = new OpenAIApi(configuration);
+const openAI = new OpenAIApi(configuration);
 
 const getResponse = async (prompt) => {
-  const response = await openai.createChatCompletion({
+  const response = await openAI.createChatCompletion({
     model,
     messages: prompt,
     temperature: 0.2,
@@ -35,24 +33,20 @@ const getResponse = async (prompt) => {
 };
 
 export async function handleInput(conversation_history) {
-  // Update the conversation history
+  // AI 역할 지정
   let requestConversation = [
     { role: "system", content: "You are a nodejs developer assistant. And answer me in English" },
   ];
   requestConversation.push(conversation_history);
-  // Generate a response using GPT-3
-  return getResponse(conversation_history)
-    .then(async (message) => {
-      // Update the conversation history
-      const answer = { role: "assistant", content: message };
-      
-      // Print the response
-      console.log(`${model}: ${message}`);
-      const data = await parseData(answer);
-      return data;
-    })
-    .catch((err) => {
-      console.error(err);
-      return Promise.reject(err);
-    });
+  // GPT에게 질문하고 응답 반환
+  try {
+    const response = await getResponse(conversation_history);
+    const answer = { role: "assistant", content: response };
+    console.log(`${model}: ${response}`);
+    convertToHtml(answer);
+    return { answer };
+  } catch (err) {
+    console.error(err);
+    return Promise.reject(err);
+  }
 }
