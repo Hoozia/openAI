@@ -31,7 +31,6 @@ const getResponse = async (prompt) => {
     temperature: 0.2,
   });
 
-  response.data.choices[0].message.
   return response.data.choices[0].message.content;
 };
 
@@ -54,5 +53,6 @@ export async function handleInput(conversation_history) {
     })
     .catch((err) => {
       console.error(err);
+      return Promise.reject(err);
     });
 }
