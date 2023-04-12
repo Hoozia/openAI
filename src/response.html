@@ -45,7 +45,7 @@
       display: flex;
     }
 
-    #chat_input {
+    #chat-input {
       color: #2f2f2f;
       font-family: Raleway, sans-serif;
       font-size: 16px;
@@ -128,7 +128,7 @@
   <div class="chat-body"></div>
 
   <div class="chat-box-footer">
-    <textarea id="chat_input" placeholder="Enter your message here..."></textarea>
+    <textarea id="chat-input" placeholder="Enter your message here..."></textarea>
     <button id="send">
       <svg style="width:24px;height:24px" viewBox="0 0 24 24">
         <path fill="#006ae3" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
@@ -137,16 +137,18 @@
   </div>
 </body>
 <script>
-  const chatInput = document.querySelector('#chat_input');
+  const chatInput = document.querySelector('#chat-input');
   const typing = document.querySelector('#typing');
   const send = document.querySelector('#send');
-  const chatMessages = document.querySelector('#chat_messages');
-  const chatBoxBody = document.querySelector('#chat_box_body');
-  const chatThread = {};
 
   loadChatHistory();
 
   // ----- EVENTS ----- //
+
+  document.querySelector('#delete').addEventListener('click', function () {
+    localStorage.clear();
+    location.reload();
+  });
 
   chatInput.addEventListener('input', function () {
     this.style.height = '0';
@@ -254,11 +256,6 @@
           copyButton.textContent = 'Failed to copy code block: ', + err
         });
     });
-  });
-
-  document.querySelector('#delete').addEventListener('click', function () {
-    localStorage.clear();
-    location.reload();
   });
 
   // 대화 내역을 저장하는 함수
