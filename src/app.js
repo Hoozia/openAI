@@ -17,8 +17,8 @@ app.get('/', (req, res) => {
 
 app.post('/', async (req, res) => {
   // post 요청을 받았을 때, 새로운 HTML 페이지를 생성합니다.
-  const question = req.body.question;
-  const html = await handleInput(question);
+  const conversation_history = req.body;
+  const html = await handleInput(conversation_history);
 
   // 생성된 HTML 페이지를 응답으로 보냅니다.
   res.send(html);
