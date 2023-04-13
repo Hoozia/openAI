@@ -16,23 +16,24 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', async (req, res) => {
-  // post 요청을 받았을 때, 새로운 HTML 페이지를 생성합니다.
-  const conversation_history = req.body;
-  const html = await handleInput(conversation_history);
-
-  // 생성된 HTML 페이지를 응답으로 보냅니다.
-  res.send(html);
+  try {
+    const conversation_history = req.body;
+    const html = await handleInput(conversation_history);
+    res.send(html);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 });
 
 app.listen(15000, () => {
   console.log(`
-##     ## ##    ##     ######  ##     ##    ###    ########     ######   ########  ######## 
-###   ###  ##  ##     ##    ## ##     ##   ## ##      ##       ##    ##  ##     ##    ##    
-#### ####   ####      ##       ##     ##  ##   ##     ##       ##        ##     ##    ##    
-## ### ##    ##       ##       ######### ##     ##    ##       ##   #### ########     ##    
-##     ##    ##       ##       ##     ## #########    ##       ##    ##  ##           ##    
-##     ##    ##       ##    ## ##     ## ##     ##    ##       ##    ##  ##           ##    
-##     ##    ##        ######  ##     ## ##     ##    ##        ######   ##           ##    
-`);
+  ##     ## ##    ##     ######  ##     ##    ###    ########     ######   ########  ######## 
+  ###   ###  ##  ##     ##    ## ##     ##   ## ##      ##       ##    ##  ##     ##    ##    
+  #### ####   ####      ##       ##     ##  ##   ##     ##       ##        ##     ##    ##    
+  ## ### ##    ##       ##       ######### ##     ##    ##       ##   #### ########     ##    
+  ##     ##    ##       ##       ##     ## #########    ##       ##    ##  ##           ##    
+  ##     ##    ##       ##    ## ##     ## ##     ##    ##       ##    ##  ##           ##    
+  ##     ##    ##        ######  ##     ## ##     ##    ##        ######   ##           ##    
+  `);
   console.log('Server listening on port 15000');
 });

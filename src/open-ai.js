@@ -22,8 +22,8 @@ function convertToHtml(answer) {
 const openAI = new OpenAIApi(configuration);
 
 async function getResponse(prompt) {
-  const response = await openAI
-    .createChatCompletion(
+  try {
+    const response = await openAI.createChatCompletion(
       {
         model,
         messages: prompt,
@@ -33,19 +33,19 @@ async function getResponse(prompt) {
         timeout: 120000 * 2,
         maxBodyLength: 8192 * 2,
       }
-    )
-    .catch((err) => {
-      const errorData = err.response?.data;
-      if (errorData.code === "context_length_exceeded") {
-        console.log("context_length_exceeded");
-      }
-      return Promise.reject(err);
-    });
+    );
 
-  const totalTokens = response.data.usage.prompt_tokens;
-  console.log("use token : ", totalTokens);
+    const totalTokens = response.data.usage.prompt_tokens;
+    console.log("use token : ", totalTokens);
 
-  return response.data.choices[0].message.content;
+    return response.data.choices[0].message.content;
+  } catch (err) {
+    const errorData = err.response?.data;
+    if (errorData.code === "context_length_exceeded") {
+      console.log("context_length_exceeded");
+    }
+    throw err;
+  }
 }
 
 export async function handleInput(conversation_history) {
@@ -70,7 +70,10 @@ export async function handleInput(conversation_history) {
   // GPT에게 질문하고 응답 반환
   try {
     const response = await getResponse(
-      [requestConversation, conversation_history].flat()
+      conversation_history.reduce(
+        (acc, cur) => acc.concat(cur),
+        requestConversation
+      )
     );
     const answer = { role: "assistant", content: response };
     console.log(`${model}: ${response}`);
