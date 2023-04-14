@@ -135,14 +135,14 @@
       </svg>
     </button>
   </div>
-</body>
+
 <script>
   const chatInput = document.querySelector('#chat-input');
   const typing = document.querySelector('#typing');
   const send = document.querySelector('#send');
 
   loadChatHistory();
-
+  
   // ----- EVENTS ----- //
 
   document.querySelector('#delete').addEventListener('click', function () {
@@ -279,7 +279,6 @@
     let answer = JSON.parse(localStorage.getItem('answer'));
     // chatHistory가 null이 아니면, JSON.parse를 사용하여 객체로 변환합니다.
     if (question !== null && answer !== null) {
-      console.log(question, answer)
       showChatHistory(question, answer)
       return { question, answer };
     }
@@ -315,6 +314,7 @@
       answerDiv.className = 'answer';
       answerDiv.innerHTML = answer[i].content;
       chatBody.appendChild(answerDiv);
+      
     }
   }
 
@@ -332,7 +332,8 @@
 
     location.reload()
   }
-
+  //TODO : 화면을 가장 마지막 답변에 focus하도록 하기
+  document.getElementById('chat-input').focus();
 </script>
-
+</body>
 </html>

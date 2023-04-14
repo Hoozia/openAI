@@ -49,6 +49,8 @@ async function getResponse(prompt) {
     const errorData = err.response?.data;
     if (errorData.code === "context_length_exceeded") {
       console.log("context_length_exceeded");
+    } else {
+      console.log(errorData)
     }
     throw err;
   }
