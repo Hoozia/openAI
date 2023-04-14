@@ -1,10 +1,53 @@
 import express from "express";
 import path from "path";
 import { handleInput } from "./open-ai.js";
-import { fileTest } from "./open-ai-file.js";
+import { fineTuneAI } from "./open-ai-file.js";
+import { createImageAI } from "./open-ai-image.js";
+
+import { LLama } from "llama-node";
+import { LLamaCpp } from "llama-node/dist/llm/llama-cpp.js";
+import { LLamaRS } from "llama-node/dist/llm/llama-rs.js";
+import fs  from "fs";
 
 const app = express();
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+//TODO : https://github.com/hlhr202/llama-node#usage-llamacpp-backend 참고해서 구현해보기
+//TODO : https://www.youtube.com/watch?v=vNHjeQxNuS0 이것도 참고
+const model = path.resolve(process.cwd(), "./src/ggml-vicuna-13b-1.1-q4_0.bin");
+
+
+const llama = new LLama(LLamaRS);
+
+llama.load({ path: model });
+
+const template = `please implement node js express server to handle the request from the client. code give me`;
+
+const prompt = `Below is an instruction that describes a task. Write a response that appropriately completes the request. You are a node js, html developer and code reviewer, always answer in English, and when you write code, be sure to wrap it in a code block in markdown format before replying.
+
+### Instruction:
+
+${template}
+
+### Response:`;
+
+llama.createCompletion(
+    {
+        prompt,
+        numPredict: 128,
+        temp: 0.7,
+        topP: 1,
+        topK: 40,
+        repeatPenalty: 1,
+        repeatLastN: 64,
+        seed: 0,
+        feedPrompt: true,
+    },
+    (response) => {
+        process.stdout.write(response.token);
+    }
+);
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -13,13 +56,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/response.html");
 });
-
-// 미세 조정 모델은 GPT3 모델만 가능해서 일단 보류
-// app.get("/file-test", async (req, res) => {
-//   await fineTuneAI();
-
-//   res.send("file test");
-// });
 
 app.post("/", async (req, res, next) => {
   const conversation_history = req.body;
@@ -30,6 +66,28 @@ app.post("/", async (req, res, next) => {
     next(error);
   }
 });
+
+// 미세 조정 모델은 GPT3 모델만 가능해서 일단 보류
+// app.get("/file-test", async (req, res) => {
+//   await fineTuneAI();
+
+//   res.send("file test");
+// });
+
+
+app.get("/create-image", async (req, res) => {
+  res.sendFile(__dirname + "/image.html");
+});
+
+app.post("/create-image", async (req, res) => {
+  const body = req.body;
+  const requestImage = body.request_image
+  const imageUrl = await createImageAI(requestImage);
+
+  return res.send(imageUrl);
+});
+
+
 
 app.listen(15000, () => {
   console.log(`

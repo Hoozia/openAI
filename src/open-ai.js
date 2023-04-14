@@ -29,6 +29,7 @@ const openAI = new OpenAIApi(configuration);
 
 async function getResponse(prompt) {
   try {
+    console.log(prompt)
     const response = await openAI.createChatCompletion(
       {
         model,
@@ -46,7 +47,7 @@ async function getResponse(prompt) {
 
     return response.data.choices[0].message.content;
   } catch (err) {
-    const errorData = err.response?.data;
+    const errorData = err.response.data;
     if (errorData.code === "context_length_exceeded") {
       console.log("context_length_exceeded");
     } else {
@@ -62,7 +63,7 @@ export async function handleInput(conversation_history) {
     {
       role: "system",
       content:
-        "You are a nodejs, html developer assistant and code reviewer. And answer me in English",
+        "You are a node js, html developer and code reviewer, always answer in English, and when you write code, be sure to wrap it in a code block in markdown format before replying.",
     },
   ];
   // 데이터를 파일로 저장합니다.
