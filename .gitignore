@@ -3,3 +3,5 @@ open-ai-list.js
 answer.html
 .env
 /.vscode
+*.bin
+/dist

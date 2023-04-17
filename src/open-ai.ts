@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { Configuration, OpenAIApi } from "openai";
+import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 import * as marked from "marked";
 import { config } from "dotenv";
 import { get_encoding, encoding_for_model } from "@dqbd/tiktoken";
@@ -9,7 +9,7 @@ config(); // dotenv 설정
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const filePath = __dirname + "/open-ai.js";
-const fine_tunes = [];
+const fine_tunes: Object[] = [];
 const model = "gpt-3.5-turbo";
 
 config(); // dotenv 설정
@@ -21,13 +21,13 @@ const configuration = new Configuration({
 
 const enc = encoding_for_model(model);
 
-function convertToHtml(answer) {
+function convertToHtml(answer: ChatCompletionRequestMessage) {
   answer.content = marked.marked(answer.content);
 }
 
 const openAI = new OpenAIApi(configuration);
 
-async function getResponse(prompt) {
+async function getResponse(prompt: ChatCompletionRequestMessage[]) {
   try {
     console.log(prompt)
     const response = await openAI.createChatCompletion(
@@ -42,12 +42,12 @@ async function getResponse(prompt) {
       }
     );
 
-    const totalTokens = response.data.usage.prompt_tokens;
+    const totalTokens = response.data?.usage?.prompt_tokens;
     console.log("use token : ", totalTokens);
 
-    return response.data.choices[0].message.content;
-  } catch (err) {
-    const errorData = err.response.data;
+    return response.data?.choices[0]?.message?.content;
+  } catch (err: Error | any) {
+    const errorData = err.response?.data;
     if (errorData.code === "context_length_exceeded") {
       console.log("context_length_exceeded");
     } else {
@@ -57,9 +57,9 @@ async function getResponse(prompt) {
   }
 }
 
-export async function handleInput(conversation_history) {
+export async function handleInput(conversation_history: ChatCompletionRequestMessage[]) {
   // AI 역할 지정
-  const requestConversation = [
+  const requestConversation: ChatCompletionRequestMessage[] = [
     {
       role: "system",
       content:
@@ -113,8 +113,9 @@ export async function handleInput(conversation_history) {
         (acc, cur) => acc.concat(cur),
         requestConversation
       )
-    );
-    const answer = { role: "assistant", content: response };
+    ) || "";
+    
+    const answer: ChatCompletionRequestMessage = { role: "assistant", content: response };
     console.log(`${model}: ${response}`);
     convertToHtml(answer);
     return { answer };

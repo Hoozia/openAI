@@ -5,7 +5,7 @@ import { fineTuneAI } from "./open-ai-file.js";
 import { createImageAI } from "./open-ai-image.js";
 
 import { LLama } from "llama-node";
-import { LLamaCpp } from "llama-node/dist/llm/llama-cpp.js";
+import { LLamaCpp, LoadConfig } from "llama-node/dist/llm/llama-cpp.js";
 import { LLamaRS } from "llama-node/dist/llm/llama-rs.js";
 import fs  from "fs";
 
@@ -17,31 +17,41 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 // const model = path.resolve(process.cwd(), "./src/ggml-vicuna-13b-1.1-q4_0.bin");
 
 
-// const llama = new LLama(LLamaRS);
+// const llama = new LLama(LLamaCpp);
 
-// llama.load({ path: model });
+// const config: LoadConfig = {
+//     path: model,
+//     enableLogging: true,
+//     nCtx: 1024,
+//     nParts: -1,
+//     seed: 0,
+//     f16Kv: false,
+//     logitsAll: false,
+//     vocabOnly: false,
+//     useMlock: false,
+//     embedding: false,
+// };
 
-// const template = `please implement node js express server to handle the request from the client. code give me`;
+// llama.load(config);
 
-// const prompt = `Below is an instruction that describes a task. Write a response that appropriately completes the request. You are a node js, html developer and code reviewer, always answer in English, and when you write code, be sure to wrap it in a code block in markdown format before replying.
+// const template = `How are you`;
 
-// ### Instruction:
+// const prompt = `### Human:
 
 // ${template}
 
-// ### Response:`;
+// ### Assistant:`;
 
 // llama.createCompletion(
 //     {
-//         prompt,
-//         numPredict: 128,
-//         temp: 0.7,
-//         topP: 1,
+//         nThreads: 4,
+//         nTokPredict: 2048,
 //         topK: 40,
+//         topP: 0.1,
+//         temp: 0.2,
 //         repeatPenalty: 1,
-//         repeatLastN: 64,
-//         seed: 0,
-//         feedPrompt: true,
+//         stopSequence: "### Human",
+//         prompt,
 //     },
 //     (response) => {
 //         process.stdout.write(response.token);
@@ -54,7 +64,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/response.html");
+  res.sendFile(path.resolve(process.cwd(), "./src/response.html"));
 });
 
 app.post("/", async (req, res, next) => {

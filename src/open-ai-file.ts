@@ -11,7 +11,8 @@ export async function fineTuneAI() {
   const __dirname = path.dirname(new URL(import.meta.url).pathname);
   const filePath = __dirname + "/fine_tunes.json";
 
-  const file = fs.createReadStream(filePath);
+  const file = fs.createReadStream(filePath) as any;
+
   try {
     const organization = process.env.ORGANIZATION;
     const apiKey = process.env.OPEN_AI_API_KEY;

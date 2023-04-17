@@ -7,7 +7,7 @@ import path from "path";
 
 config(); // dotenv 설정
 
-export async function createImageAI(requestImage) {
+export async function createImageAI(requestImage: string) {
   try {
     console.log(requestImage);
     const apiKey = process.env.OPEN_AI_API_KEY;
