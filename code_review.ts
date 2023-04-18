@@ -1,16 +1,17 @@
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
-import { Configuration, OpenAIApi } from 'openai';
+import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai';
 import axios from 'axios';
 import { getOctokit, context } from '@actions/github';
+
 
 const readFile = promisify(fs.readFile);
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
-const isGitLab = process.env.CI_PROJECT_URL
+const isGitLab: boolean = process.env.CI_PROJECT_URL
   ? process.env.CI_PROJECT_URL.includes('gitlab.com')
   : false;
 export function getContext() {
@@ -18,8 +19,8 @@ export function getContext() {
 }
 
 export async function addReviewToGitHub(
-  reviews,
-) {
+  reviews: Record<string, string>,
+): Promise<void> {
   const githubToken = process.env.GITHUB_TOKEN;
   const octokit = getOctokit(githubToken);
 
@@ -30,7 +31,7 @@ export async function addReviewToGitHub(
   });
 
   for (const [file, review] of Object.entries(reviews)) {
-    let lastCommitSha;
+    let lastCommitSha: string | undefined;
 
     for (const commit of commits) {
       const { data: commitData } = await octokit.rest.repos.getCommit({
@@ -56,7 +57,6 @@ export async function addReviewToGitHub(
       });
 
       const changedFile = diff.files.find((f) => f.filename === file);
-      console.log('diff files : ', changedFile)
       const position = changedFile.patch.split('\n').length - 1;
 
       await octokit.rest.pulls.createReviewComment({
@@ -73,10 +73,10 @@ export async function addReviewToGitHub(
 }
 
 export async function findLastCommitForFile(
-  projectId,
-  mergeRequestId,
-  file,
-){
+  projectId: string,
+  mergeRequestId: string,
+  file: string,
+): Promise<string | null> {
   const gitlabApiToken = process.env.GITLAB_API_TOKEN;
   const gitlabApiUrl = `https://gitlab.com/api/v4/projects/${projectId}/merge_requests/${mergeRequestId}/commits`;
 
@@ -112,8 +112,8 @@ export async function findLastCommitForFile(
 }
 
 export async function addReviewToGitLab(
-  reviews,
-) {
+  reviews: Record<string, string>,
+): Promise<void> {
   const projectId = process.env.CI_PROJECT_ID;
   const mergeRequestId = process.env.CI_MERGE_REQUEST_IID;
 
@@ -144,11 +144,11 @@ export async function addReviewToGitLab(
 }
 
 export async function createGitLabComment(
-  projectId,
-  mergeRequestId,
-  comment,
-  commitSha
-) {
+  projectId: string,
+  mergeRequestId: string,
+  comment: string,
+  commitSha: string,
+): Promise<any> {
   const gitlabApiToken = process.env.GITLAB_API_TOKEN;
   const gitlabApiUrl = `https://gitlab.com/api/v4/projects/${projectId}/merge_requests/${mergeRequestId}/notes`;
 
@@ -181,13 +181,13 @@ export async function createGitLabComment(
 }
 
 class ReviewPlatform {
-  platform;
+  platform: string;
 
-  constructor(platform) {
+  constructor(platform: string) {
     this.platform = platform;
   }
 
-  async addReview(reviews) {
+  async addReview(reviews: Record<string, string>): Promise<void> {
     if (this.platform === 'github') {
       return addReviewToGitHub(reviews);
     } else if (this.platform === 'gitlab') {
@@ -198,19 +198,19 @@ class ReviewPlatform {
   }
 }
 
-export async function main() {
+export async function main(): Promise<void> {
   const projectRoot = process.cwd();
   const files = process.argv.slice(2);
-  const reviews = {};
+  const reviews: Record<string, string> = {};
 
   for (const file of files) {
     const code = await readFile(file, 'utf-8');
-    const prompt = `Please review the following NodeJs code:\n\n${code}\n`;
-    const chatMessages = [
+    const prompt = `Please review the following code:\n\n${code}\n`;
+    const chatMessages: Array<ChatCompletionRequestMessage> = [
       {
         role: 'system',
         content:
-          'As a code reviewer, I am focusing on identifying structural improvements and duplicated code in NodeJS, HTML, particularly within the context of the Express framework. My goal is to provide a review that highlights best practices and potential areas of improvement, ultimately enhancing the overall quality of your project. In addition to this, I will also emphasize on the abstraction aspect of your code, ensuring that your application is modular and follows the principles of encapsulation and separation of concerns. Once you provide your code, I will offer feedback on structural improvements, duplicated code, and abstraction tailored to your specific implementation. Please paste your code below. Lastly, please note that the review will be provided in Korean.',
+          'As a code reviewer, I am focusing on identifying structural improvements and duplicated code in TypeScript, NodeJs, Html, particularly within the context of the NestJS framework. My goal is to provide a review that highlights best practices and potential areas of improvement, ultimately enhancing the overall quality of your project. In addition to this, I will also emphasize on the abstraction aspect of your code, ensuring that your application is modular and follows the principles of encapsulation and separation of concerns. Once you provide your code, I will offer feedback on structural improvements, duplicated code, and abstraction tailored to your specific implementation. Please paste your code below. Lastly, please note that the review will be provided in Korean.',
       },
       { role: 'user', content: prompt },
     ];

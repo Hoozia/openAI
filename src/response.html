@@ -12,7 +12,7 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     @import url("https://fonts.googleapis.com/css?family=Raleway:400,400i,700");
- 
+
     body {
       font-family: sans-serif;
       background-color: #343541;
@@ -25,6 +25,8 @@
       margin-bottom: 1em;
       background-color: #343541;
       color: #ECECF1;
+      box-sizing: border-box;
+      border-radius: 13px;
     }
 
     .answer {
@@ -33,8 +35,8 @@
       background-color: #444654;
       color: #D1D5DB;
       border: 0 solid #d9d9e3;
-      border-radius: 1px;
       box-sizing: border-box;
+      border-radius: 13px;
     }
 
     .chat-box-footer {
@@ -59,6 +61,9 @@
       box-sizing: border-box;
       border-radius: 13px;
       transition: 0.3s background-color;
+      flex: 1;
+      margin-right: 10px;
+      margin-left: 8%;
     }
 
     #send {
@@ -82,6 +87,20 @@
       box-sizing: border-box;
     }
 
+    .new-page-button-container {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    #new-page-button {
+      background-color: #444654;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 5px;
+      cursor: pointer;
+    }
     .copy-button {
       float: right;
       background-color: #343541;
@@ -96,6 +115,16 @@
       background-color: #444654;
     }
 
+    .chat-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 100%;
+      margin-left: 9%;
+      margin-right: 1%;
+    }
+
     .delete {
       background-color: transparent;
       border: none;
@@ -105,6 +134,7 @@
     }
 
     .button-container {
+      margin-top: 20px;
       margin-bottom: 20px;
       text-align: right;
     }
@@ -113,227 +143,259 @@
       text-align: right;
       margin-bottom: 10px;
     }
+
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 8%;
+      background-color: #444654;
+      border-right: 1px solid #ccc;
+    }
   </style>
+
+
 </head>
 
 <body>
-  <div class="button-container">
-    <button id="delete" class="delete"> 모든 대화 비우기
-      <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-        <path fill="#006ae3" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
-      </svg>
-    </button>
+  <div class="wrapper">
+    <div class="sidebar">
+      <div class="new-page-button-container">
+        <button id="new-page-button">IMAGE AI PAGE</button>
+      </div>
+    </div>
+    <div class="button-container">
+      <button id="delete" class="delete"> 모든 대화 비우기
+        <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+          <path fill="#006ae3" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="chat-body"></div>
+
+    <div class="chat-box-footer">
+      <textarea id="chat-input" placeholder="Enter your message here..."></textarea>
+      <button id="send">
+        <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+          <path fill="#006ae3" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+        </svg>
+      </button>
+    </div>
   </div>
 
-  <div class="chat-body"></div>
+  <script>
+    const chatInput = document.querySelector('#chat-input');
+    const typing = document.querySelector('#typing');
+    const send = document.querySelector('#send');
+    const newPageButton = document.querySelector('#new-page-button');
 
-  <div class="chat-box-footer">
-    <textarea id="chat-input" placeholder="Enter your message here..."></textarea>
-    <button id="send">
-      <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-        <path fill="#006ae3" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
-      </svg>
-    </button>
-  </div>
 
-<script>
-  const chatInput = document.querySelector('#chat-input');
-  const typing = document.querySelector('#typing');
-  const send = document.querySelector('#send');
 
-  loadChatHistory();
-  
-  // ----- EVENTS ----- //
+    loadChatHistory();
 
-  document.querySelector('#delete').addEventListener('click', function () {
-    localStorage.clear();
-    location.reload();
-  });
+    // ----- EVENTS ----- //
 
-  chatInput.addEventListener('input', function () {
-    this.style.height = '0';
-    this.style.height = this.scrollHeight + 1 + 'px';
-  });
-
-  chatInput.addEventListener('keydown', async function (evt) {
-    if (evt.keyCode == 13 && !evt.shiftKey) {
-      evt.preventDefault();
-      await sendMessage('my', this);
-      chatInput.disabled = false;
-    }
-  });
-
-  send.addEventListener('click', async function (evt) {
-    evt.preventDefault();
-    await sendMessage('my', chatInput);
-  });
-
-  async function sendMessage(sender, input) {
-    send.disabled = true;
-    chatInput.disabled = true;
-
-    let questionStorage = JSON.parse(localStorage.getItem('question'));
-    let answerStorage = JSON.parse(localStorage.getItem('answer'));
-
-    if (questionStorage === null) {
-      questionStorage = [];
-    }
-    if (answerStorage === null) {
-      answerStorage = [];
-    }
-
-    const question = { role: "user", content: input.value.toString() };
-    questionStorage.push(question)
-    localStorage.setItem('question', JSON.stringify(questionStorage));
-    const bodyData = []
-    for(let i = 0; i < questionStorage.length; i++) {
-      bodyData.push(questionStorage[i])
-      if (answerStorage[i]) {
-        bodyData.push(answerStorage[i])
-      }
-    }
-
-    input.value = '현재 AI가 답변을 준비중입니다... 잠시만 기다려주세요.';
-    const response = await fetch('/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(bodyData)
-    }).then(response => {
-      if (response.ok) {
-        send.disabled = false;
-        chatInput.disabled = false;
-        return response.text();
-      }
-      throw new Error('Network response was not ok.');
-    })
-      .then(html => {
-        const { answer } = JSON.parse(html)
-        saveChatHistory(answer)
-
-        location.reload();
-      })
-      .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-      });
-
-    input.value = '';
-  }
-
-  document.querySelectorAll('pre code').forEach(function (codeBlock) {
-    // Create copy button
-    const parent = codeBlock.parentElement;
-    if (parent.className === 'question') {
-      return;
-    }
-
-    const copyButton = document.createElement('button');
-    const copyDiv = document.createElement('div');
-    const codeBlockDiv = document.createElement('div');
-    if(!codeBlock.getAttribute('class')){
-      codeBlock.setAttribute('class', 'language-bash');
-    }
-
-    codeBlockDiv.className = 'code-block-div';
-    codeBlockDiv.appendChild(copyButton);
-    copyDiv.className = 'copy-div';
-
-    copyButton.className = 'copy-button';
-    copyButton.textContent = 'Copy';
-
-    // Append copy button to code block
-    codeBlock.parentNode.insertBefore(codeBlockDiv, codeBlock);
-
-    // Add copy event listener to copy button
-    copyButton.addEventListener('click', function () {
-      const code = codeBlock.innerText;
-      navigator.clipboard.writeText(code)
-        .then(function () {
-          copyButton.textContent = 'Code block copied to clipboard.';
-        })
-        .catch(function (err) {
-          copyButton.textContent = 'Failed to copy code block: ', + err
-        });
+    newPageButton.addEventListener('click', () => {
+      window.location.href = 'http://localhost:15000/create-image';
     });
-  });
 
-  // 대화 내역을 저장하는 함수
-  function saveChatHistory(answer) {
-    // 로컬 스토리지에 chatHistory라는 키로 대화 내역을 저장합니다.    
-    let answerStorage = JSON.parse(localStorage.getItem('answer'));
+    document.querySelector('#delete').addEventListener('click', function () {
+      localStorage.clear();
+      location.reload();
+    });
 
-    if (answerStorage === null) {
-      answerStorage = [];
+    chatInput.addEventListener('input', function () {
+      this.style.height = '0';
+      this.style.height = this.scrollHeight + 1 + 'px';
+    });
+
+    chatInput.addEventListener('keydown', async function (evt) {
+      if (evt.keyCode == 13 && !evt.shiftKey) {
+        evt.preventDefault();
+        await sendMessage('my', this);
+        chatInput.disabled = false;
+      }
+    });
+
+    send.addEventListener('click', async function (evt) {
+      evt.preventDefault();
+      await sendMessage('my', chatInput);
+    });
+
+    async function sendMessage(sender, input) {
+      send.disabled = true;
+      chatInput.disabled = true;
+
+      let questionStorage = JSON.parse(localStorage.getItem('question'));
+      let answerStorage = JSON.parse(localStorage.getItem('answer'));
+
+      if (questionStorage === null) {
+        questionStorage = [];
+      }
+      if (answerStorage === null) {
+        answerStorage = [];
+      }
+
+      const question = { role: "user", content: input.value.toString() };
+      questionStorage.push(question)
+      localStorage.setItem('question', JSON.stringify(questionStorage));
+      const bodyData = []
+      for (let i = 0; i < questionStorage.length; i++) {
+        bodyData.push(questionStorage[i])
+        if (answerStorage[i]) {
+          bodyData.push(answerStorage[i])
+        }
+      }
+
+      input.value = '현재 AI가 답변을 준비중입니다... 잠시만 기다려주세요.';
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bodyData)
+      }).then(response => {
+        if (response.ok) {
+          send.disabled = false;
+          chatInput.disabled = false;
+          return response.text();
+        }
+        throw new Error('Network response was not ok.');
+      })
+        .then(html => {
+          const { answer } = JSON.parse(html)
+          saveChatHistory(answer)
+
+          location.reload();
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+        });
+
+      input.value = '';
     }
-    
-    answerStorage.push(answer);
 
-    localStorage.setItem('answer', JSON.stringify(answerStorage));
-  }
+    document.querySelectorAll('pre code').forEach(function (codeBlock) {
+      // Create copy button
+      const parent = codeBlock.parentElement;
+      if (parent.className === 'question') {
+        return;
+      }
 
-  // 저장된 대화 내역을 불러오는 함수
-  function loadChatHistory() {
-    // 로컬 스토리지에서 chatHistory라는 키로 저장된 대화 내역을 불러옵니다.
-    let question = JSON.parse(localStorage.getItem('question'));
-    let answer = JSON.parse(localStorage.getItem('answer'));
-    // chatHistory가 null이 아니면, JSON.parse를 사용하여 객체로 변환합니다.
-    if (question !== null && answer !== null) {
-      showChatHistory(question, answer)
-      return { question, answer };
-    }
-    // chatHistory가 null이면 빈 배열을 반환합니다.
-    return [];
-  }
+      const copyButton = document.createElement('button');
+      const copyDiv = document.createElement('div');
+      const codeBlockDiv = document.createElement('div');
+      if (!codeBlock.getAttribute('class')) {
+        codeBlock.setAttribute('class', 'language-bash');
+      }
 
-  // 대화 내역을 화면에 보여주는 함수
-  function showChatHistory(question, answer) {
-    // chatHistory 배열을 순회하면서, 각각의 대화 내역을 화면에 추가합니다.
-    const chatBody = document.querySelector('.chat-body');
-    for (let i = 0; i < question.length; i++) {
-      const deleteCovnersation = document.createElement('div');
-      deleteCovnersation.className = 'delete-conversation';
-      chatBody.appendChild(deleteCovnersation);
-      const deleteButton = document.createElement('button');
-      deleteButton.className = 'delete';
-      
-      deleteButton.textContent = '해당 대화 삭제';
-      deleteButton.addEventListener('click', () => {
-        deleteChatHistory(i);
+      codeBlockDiv.className = 'code-block-div';
+      codeBlockDiv.appendChild(copyButton);
+      copyDiv.className = 'copy-div';
+
+      copyButton.className = 'copy-button';
+      copyButton.textContent = 'Copy';
+
+      // Append copy button to code block
+      codeBlock.parentNode.insertBefore(codeBlockDiv, codeBlock);
+
+      // Add copy event listener to copy button
+      copyButton.addEventListener('click', function () {
+        const code = codeBlock.innerText;
+        navigator.clipboard.writeText(code)
+          .then(function () {
+            copyButton.textContent = 'Code block copied to clipboard.';
+          })
+          .catch(function (err) {
+            copyButton.textContent = 'Failed to copy code block: ', + err
+          });
       });
-      
-      deleteCovnersation.appendChild(deleteButton);
-      
+    });
 
-      const questionDiv = document.createElement('div');
-      questionDiv.className = 'question';
-      questionDiv.innerText = question[i].content;
-      chatBody.appendChild(questionDiv);
+    // 대화 내역을 저장하는 함수
+    function saveChatHistory(answer) {
+      // 로컬 스토리지에 chatHistory라는 키로 대화 내역을 저장합니다.    
+      let answerStorage = JSON.parse(localStorage.getItem('answer'));
 
-      const answerDiv = document.createElement('div');
-      answerDiv.className = 'answer';
-      answerDiv.innerHTML = answer[i].content;
-      chatBody.appendChild(answerDiv);
-      
+      if (answerStorage === null) {
+        answerStorage = [];
+      }
+
+      answerStorage.push(answer);
+
+      localStorage.setItem('answer', JSON.stringify(answerStorage));
     }
-  }
 
-  function deleteChatHistory(index) {
-    let questionStorage = JSON.parse(localStorage.getItem('question'));
-    let answerStorage = JSON.parse(localStorage.getItem('answer'));
+    // 저장된 대화 내역을 불러오는 함수
+    function loadChatHistory() {
+      // 로컬 스토리지에서 chatHistory라는 키로 저장된 대화 내역을 불러옵니다.
+      let question = JSON.parse(localStorage.getItem('question'));
+      let answer = JSON.parse(localStorage.getItem('answer'));
+      // chatHistory가 null이 아니면, JSON.parse를 사용하여 객체로 변환합니다.
+      if (question !== null && answer !== null) {
+        showChatHistory(question, answer)
+        return { question, answer };
+      }
+      // chatHistory가 null이면 빈 배열을 반환합니다.
+      return [];
+    }
 
-    // 해당 인덱스의 대화 내역을 삭제합니다.
-    questionStorage.splice(index, 1);
-    answerStorage.splice(index, 1);
+    // 대화 내역을 화면에 보여주는 함수
+    function showChatHistory(question, answer) {
+      // chatHistory 배열을 순회하면서, 각각의 대화 내역을 화면에 추가합니다.
+      const chatBody = document.querySelector('.chat-body');
+      for (let i = 0; i < question.length; i++) {
+        const deleteConversation = document.createElement('div');
+        deleteConversation.className = 'delete-conversation';
+        chatBody.appendChild(deleteConversation);
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete';
 
-    // 변경된 대화 내역을 다시 로컬 스토리지에 저장합니다.
-    localStorage.setItem('question', JSON.stringify(questionStorage));
-    localStorage.setItem('answer', JSON.stringify(answerStorage));
+        deleteButton.textContent = '해당 대화 삭제';
+        deleteButton.addEventListener('click', () => {
+          deleteChatHistory(i);
+        });
 
-    location.reload()
-  }
-  //TODO : 화면을 가장 마지막 답변에 focus하도록 하기
-  document.getElementById('chat-input').focus();
-</script>
+        deleteConversation.appendChild(deleteButton);
+
+
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question';
+        questionDiv.innerText = question[i].content;
+        chatBody.appendChild(questionDiv);
+
+        const answerDiv = document.createElement('div');
+        answerDiv.className = 'answer';
+        answerDiv.innerHTML = answer[i].content;
+        chatBody.appendChild(answerDiv);
+
+      }
+    }
+
+    function deleteChatHistory(index) {
+      let questionStorage = JSON.parse(localStorage.getItem('question'));
+      let answerStorage = JSON.parse(localStorage.getItem('answer'));
+
+      // 해당 인덱스의 대화 내역을 삭제합니다.
+      questionStorage.splice(index, 1);
+      answerStorage.splice(index, 1);
+
+      // 변경된 대화 내역을 다시 로컬 스토리지에 저장합니다.
+      localStorage.setItem('question', JSON.stringify(questionStorage));
+      localStorage.setItem('answer', JSON.stringify(answerStorage));
+
+      location.reload()
+    }
+    //TODO : 화면을 가장 마지막 답변에 focus하도록 하기
+    document.getElementById('chat-input').focus();
+  </script>
 </body>
+
 </html>

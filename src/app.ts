@@ -1,20 +1,16 @@
 import express from "express";
 import path from "path";
 import { handleInput } from "./open-ai.js";
-import { fineTuneAI } from "./open-ai-file.js";
 import { createImageAI } from "./open-ai-image.js";
-
 import { LLama } from "llama-node";
 import { LLamaCpp, LoadConfig } from "llama-node/dist/llm/llama-cpp.js";
-import { LLamaRS } from "llama-node/dist/llm/llama-rs.js";
-import fs from "fs";
 
 const app = express();
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 try {
   //TODO : https://github.com/hlhr202/llama-node#usage-llamacpp-backend 참고해서 구현해보기
   //TODO : https://www.youtube.com/watch?v=vNHjeQxNuS0 이것도 참고
-  const model = path.resolve(process.cwd(), "./src/ggml-model-q4_1.bin");
+  const model = path.resolve(process.cwd(), "./src/ggml-model-q4_0.bin");
 
   const llama = new LLama(LLamaCpp);
 

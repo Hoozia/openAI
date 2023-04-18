@@ -23,16 +23,20 @@
             resize: none;
         }
 
-        .submit-button-container,
-        .clear-button-container {
-            position: absolute;
-            bottom: 0;
-            width: 50%;
+        .button-container {
             text-align: center;
         }
 
-        .submit-button-container button,
-        .clear-button-container button {
+        .submit-button-container,
+        .clear-button-container {
+            display: inline-block;
+            position: relative;
+            bottom: 0;
+            width: 30%;
+            text-align: center;
+        }
+
+        .submit-button-container button{
             width: 100%;
             padding: 10px;
             border-radius: 5px;
@@ -41,10 +45,21 @@
             color: #fff;
             cursor: pointer;
         }
+        .clear-button-container button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #d51832;
+            color: #fff;
+            cursor: pointer;
+        }
 
-        .submit-button-container button:hover,
-        .clear-button-container button:hover {
+        .submit-button-container button:hover{
             background-color: #3e8e41;
+        }
+        .clear-button-container button:hover {
+            background-color: #840b1e;
         }
 
         .preview-container {
@@ -66,6 +81,8 @@
     </div>
     <div class="input-container">
         <textarea id="input-box"></textarea>
+    </div>
+    <div class="button-container">
         <div class="submit-button-container">
             <button id="submit-button">전송</button>
         </div>
@@ -73,7 +90,6 @@
             <button id="clear-button">취소</button>
         </div>
     </div>
-
     <script>
 
         const submitButton = document.getElementById("submit-button");

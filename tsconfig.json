@@ -1,16 +1,15 @@
 {
-    "compilerOptions": {
-      "target": "ES2017",
-      "module": "nodenext",
-      "strict": true,
-      "esModuleInterop": true,
-      "outDir": "./dist",
-      "sourceMap": true
-    },
-    "include": [
-      "./src/**/*"
-    ],
-    "exclude": [
-      "node_modules"
-    ]
-  }
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "nodenext",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "sourceMap": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+  },
+  "files": ["code_review.ts"],
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules"]
+}
