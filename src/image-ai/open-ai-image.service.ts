@@ -1,9 +1,6 @@
-import * as fs from "fs";
-import FormData from "form-data";
-import axios from "axios";
 import { Configuration, OpenAIApi } from "openai";
 import { config } from "dotenv";
-import path from "path";
+
 
 config(); // dotenv 설정
 

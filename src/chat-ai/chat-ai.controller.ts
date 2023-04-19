@@ -1,6 +1,6 @@
 import express from "express";
 import path from "path";
-import { handleInput } from "./open-ai.js";
+import { handleInput } from "./open-ai.service.js";
 
 const router = express.Router();
 

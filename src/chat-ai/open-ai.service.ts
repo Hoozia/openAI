@@ -2,13 +2,12 @@ import * as fs from "fs";
 import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 import * as marked from "marked";
 import { config } from "dotenv";
-import { get_encoding, encoding_for_model } from "@dqbd/tiktoken";
+import { encoding_for_model } from "@dqbd/tiktoken";
 import path from "path";
 
 config(); // dotenv 설정
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const filePath = __dirname + "/open-ai.js";
 const fine_tunes: Object[] = [];
 const model = "gpt-3.5-turbo";
 

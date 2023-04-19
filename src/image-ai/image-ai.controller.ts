@@ -1,6 +1,6 @@
 import express from "express";
 import path from "path";
-import { createImageAI } from "./open-ai-image.js";
+import { createImageAI } from "./open-ai-image.service.js";
 
 const router = express.Router();
 
