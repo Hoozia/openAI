@@ -9,6 +9,7 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
   },
+  "esm": true,
   "files": ["code_review.ts"],
   "include": ["./src/**/*"],
   "exclude": ["node_modules"]
