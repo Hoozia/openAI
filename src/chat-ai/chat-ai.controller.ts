@@ -1,6 +1,6 @@
 import express from "express";
 import path from "path";
-import { handleInput } from "./open-ai.service.js";
+import { getChatAIModel, handleInput } from "./open-ai.service.js";
 
 const router = express.Router();
 
@@ -21,5 +21,14 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
+
+router.get("/model-list", async (req, res, next) => {
+  try {
+    await getChatAIModel(req, res, next);
+  } catch (err) {
+    next();
+  }
+});
+
 
 export default router;
