@@ -4,6 +4,7 @@ import * as marked from "marked";
 import { config } from "dotenv";
 import { encoding_for_model } from "@dqbd/tiktoken";
 import path from "path";
+import superagent from "superagent";
 
 config(); // dotenv 설정
 
@@ -36,7 +37,6 @@ async function getResponse(prompt: ChatCompletionRequestMessage[]) {
         temperature: 0.7,
       },
       {
-        timeout: 120000 * 2,
         maxBodyLength: 8192 * 2,
       }
     );
@@ -62,7 +62,7 @@ export async function handleInput(conversation_history: ChatCompletionRequestMes
     {
       role: "system",
       content:
-        "You are a node js, html developer and code reviewer, always answer in English, and when you write code, be sure to wrap it in a code block in markdown format before replying.",
+        "you are a Java developer and provides shopping mall services, always answer in English, and when you write code, be sure to wrap it in a code block in markdown format before replying.",
     },
   ];
   // 데이터를 파일로 저장합니다.
@@ -122,4 +122,21 @@ export async function handleInput(conversation_history: ChatCompletionRequestMes
     console.error(err);
     return Promise.reject(err);
   }
+}
+
+export async function getChatAIModel() {
+
+  await superagent.get("https://api.openai.com/v1/models").send().set("Authorization", `Bearer ${process.env.OPEN_AI_API_KEY}`).end((err, res) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    
+    res.body.data = res.body.data.sort((a: any, b: any) => {
+      return a.created < b.created ? -1 : a.created > b.created ? 1 : 0;
+    });
+    
+    console.log(res.body);
+  });
+
 }
