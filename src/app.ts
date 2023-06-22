@@ -2,9 +2,21 @@ import express from "express";
 import path from "path";
 import chatRouter from './chat-ai/chat-ai.controller.js';
 import imageRouter from './image-ai/image-ai.controller.js';
+import ejs from 'ejs';
+import nunjucks from 'nunjucks';
 
 const app = express();
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+app.set("view options", {layout: false});
+app.engine('html', ejs.renderFile);  
+app.set('view engine', 'html'); 
+app.set('views', __dirname + '/../../views');
+
+nunjucks.configure('views', {
+  autoescape: false,
+  express: app,
+  watch: true,
+})
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

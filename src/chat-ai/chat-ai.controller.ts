@@ -22,9 +22,9 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.get("/model-list", (req, res, next) => {
+router.get("/model-list", async (req, res, next) => {
   try {
-    getChatAIModel();
+    await getChatAIModel(req, res, next);
   } catch (err) {
     next();
   }

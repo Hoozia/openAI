@@ -12,8 +12,6 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const fine_tunes: Object[] = [];
 const model = "gpt-3.5-turbo";
 
-config(); // dotenv 설정
-
 const configuration = new Configuration({
   organization: process.env.ORGANIZATION,
   apiKey: process.env.OPEN_AI_API_KEY,
@@ -124,19 +122,31 @@ export async function handleInput(conversation_history: ChatCompletionRequestMes
   }
 }
 
-export async function getChatAIModel() {
+export async function getChatAIModel(req, res, next) {
 
-  await superagent.get("https://api.openai.com/v1/models").send().set("Authorization", `Bearer ${process.env.OPEN_AI_API_KEY}`).end((err, res) => {
-    if (err) {
-      console.log(err);
-      return;
-    }
+  const data = {models: []};
+  try {
+    const response = await superagent.get("https://api.openai.com/v1/models").send().set("Authorization", `Bearer ${process.env.OPEN_AI_API_KEY}`)
     
-    res.body.data = res.body.data.sort((a: any, b: any) => {
-      return a.created < b.created ? -1 : a.created > b.created ? 1 : 0;
+    response.body.data = response.body.data.sort((a: any, b: any) => {
+      return a.created < b.created ? 1 : a.created > b.created ? -1 : 0;
     });
+  
+    let models = [];
     
-    console.log(res.body);
-  });
+    await response.body.data.forEach((model: any) => {
+      model.created = new Date(model.created * 1000).toLocaleString();
+      models.push({...model});
+    });
 
+    console.log(models);
+    
+    data.models = models
+
+    res.render('model-list', data);
+  
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
 }

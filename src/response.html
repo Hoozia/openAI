@@ -169,6 +169,9 @@
       <div class="new-page-button-container">
         <button id="new-page-button">IMAGE AI PAGE</button>
       </div>
+      <div class="model-list-button-container">
+        <button id="model-list-button">GPT 모델 조회</button>
+      </div>
     </div>
     <div class="button-container">
       <button id="delete" class="delete"> 모든 대화 비우기
@@ -195,6 +198,7 @@
     const typing = document.querySelector('#typing');
     const send = document.querySelector('#send');
     const newPageButton = document.querySelector('#new-page-button');
+    const modelListButton = document.querySelector('#model-list-button');
 
 
 
@@ -204,6 +208,10 @@
 
     newPageButton.addEventListener('click', () => {
       window.location.href = 'http://localhost:15000/create-image';
+    });
+
+    modelListButton.addEventListener('click', () => {
+      window.location.href = 'http://localhost:15000/model-list';
     });
 
     document.querySelector('#delete').addEventListener('click', function () {

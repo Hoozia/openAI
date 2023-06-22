@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+{% block content %}
+  <head>
+    <meta charset="UTF-8">
+    <title>Model List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="table-responsive mt-4">
+      <table class="table table-hover">
+          <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>Object</th>
+                  <th>Created</th>
+                  <th>owned_by</th>
+                  <th>permission</th>
+                  <th>root</th>
+                  <th>parent</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for model in models %}
+                  <tr>
+                      <td>{{model.id}}</td>
+                      <td>{{model.object}}</td>
+                      <td>{{model.created}}</td>
+                      <td>{{model.owned_by}}</td>
+                      <td>{{model.permission}}</td>
+                      <td>{{model.root}}</td>
+                      <th>{{model.parent}}</th>
+                  </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  </div>
+  </body>
+{% endblock %}
