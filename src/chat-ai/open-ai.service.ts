@@ -5,19 +5,21 @@ import { config } from "dotenv";
 import { encoding_for_model } from "@dqbd/tiktoken";
 import path from "path";
 import superagent from "superagent";
+import tiktoken from "tiktoken-node";
 
 config(); // dotenv 설정
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const fine_tunes: Object[] = [];
-const model = "gpt-3.5-turbo";
+const model = "gpt-3.5-turbo-0613";
 
 const configuration = new Configuration({
   organization: process.env.ORGANIZATION,
   apiKey: process.env.OPEN_AI_API_KEY,
 });
 
-const enc = encoding_for_model(model);
+// GPT 모델 설정
+const enc = tiktoken.encodingForModel(model)
 
 function convertToHtml(answer: ChatCompletionRequestMessage) {
   answer.content = marked.marked(answer.content);
@@ -97,6 +99,7 @@ export async function handleInput(conversation_history: ChatCompletionRequestMes
   let currentUseToken = 0;
   for (let i = conversation_history.length - 1; i >= 0; i--) {
     currentUseToken += enc.encode(conversation_history[i].content).length;
+    // 질문 Token 수 지정
     if (currentUseToken >= 2672) {
       conversation_history = conversation_history.slice(i + 1);
       break;

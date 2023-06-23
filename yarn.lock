@@ -701,11 +701,6 @@
   dependencies:
     "@octokit/openapi-types" "^12.11.0"
 
-"@popperjs/core@^2.9.2":
-  version "2.11.8"
-  resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.11.8.tgz"
-  integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
-
 "@sinclair/typebox@^0.25.16":
   version "0.25.24"
   resolved "https://registry.npmjs.org/@sinclair/typebox/-/typebox-0.25.24.tgz"
@@ -1330,11 +1325,6 @@ body-parser@1.20.1:
     raw-body "2.5.1"
     type-is "~1.6.18"
     unpipe "1.0.0"
-
-bootstrap@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.npmjs.org/bootstrap/-/bootstrap-5.0.1.tgz"
-  integrity sha512-Fl79+wsLOZKoiU345KeEaWD0ik8WKRI5zm0YSPj2oF1Qr+BO7z0fco6GbUtqjoG1h4VI89PeKJnMsMMVQdKKTw==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -3387,6 +3377,11 @@ test-exclude@^6.0.0:
     "@istanbuljs/schema" "^0.1.2"
     glob "^7.1.4"
     minimatch "^3.0.4"
+
+tiktoken-node@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.npmjs.org/tiktoken-node/-/tiktoken-node-0.0.6.tgz"
+  integrity sha512-MiprfzPhoKhCflzl0Jyds0VKibAgUGHfJLvBCAXPpum6Lru6ZoKQGsl8lJP0B94LPpby2B2WveOB2tZVfEZQOQ==
 
 tmpl@1.0.5:
   version "1.0.5"
