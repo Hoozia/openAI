@@ -17,9 +17,13 @@ nunjucks.configure('views', {
   express: app,
   watch: true,
 })
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({
+  limit : "50mb"
+}));
+app.use(express.urlencoded({
+  limit:"50mb",
+  extended: false
+}));
 app.use(express.static(path.join(__dirname, "public")));
 
 // 미세 조정 모델은 GPT3 모델만 가능해서 일단 보류

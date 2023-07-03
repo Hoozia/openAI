@@ -11,7 +11,7 @@ config(); // dotenv 설정
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const fine_tunes: Object[] = [];
-const model = "gpt-3.5-turbo-0613";
+const model = "gpt-3.5-turbo-16k-0613";
 
 const configuration = new Configuration({
   organization: process.env.ORGANIZATION,
